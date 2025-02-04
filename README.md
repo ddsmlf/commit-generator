@@ -67,4 +67,4 @@ To simplify running the script, you can create an alias in your terminal:
 
 
 ## Authors
-- [Melissa Carter](https://github.com/melissacarter) - Original author and maintainer
+- [Melissa Colin](https://github.com/ddsmlf) - Original author and maintainer
