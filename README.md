@@ -31,7 +31,7 @@ The script is built to be used as an alias. To create an alias, follow these ste
 1. Open your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
 2. Add the following line:
     ```bash
-    alias mkstat="alias mkstat='python3 path/to/your/repo/generate_code.py -s 'path/to/your/repo'"$@"'
+    alias mkstat="alias mkstat='python3 path/to/generate_code.py -s 'path/to/your/repo'"$@"'
 "
     ```
 3. Reload your shell configuration file:
