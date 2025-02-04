@@ -41,6 +41,38 @@ def get_script_content(prompt, llm, mode):
     response = llm.invoke(prompt)
     return response
 
+# Generate Script
+def generate_script(llm):
+    prompt = """Generate a functional and interesting Python script for a complex algorithmic problem of your choice. Do not add any comments in the script. And do not add any superfluous text outside the Python script.
+    Return only the response in this exact format:
+
+    File name: $$$<script_name_without_extension>$$$
+    Code:
+    <script_content>
+    """
+    mode = "Generating Python script"
+    code_response = get_script_content(prompt, llm, mode)
+    return code_response, mode, prompt
+
+# Fix Script
+def fix_script(llm, script_content, random_file):
+    prompt = f"""Fix the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
+    {script_content}
+    """
+    mode = "Fixing Python script"
+    code_response = get_script_content(prompt, llm, mode)
+    return code_response, mode, random_file, prompt
+
+# Generate Documentation
+def generate_doc(llm, script_content, random_file):
+    prompt = f"""Generate Markdown documentation for the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
+    {script_content}
+    """
+    mode = "Generating documentation"
+    code_response = get_script_content(prompt, llm, mode)
+    file_name = random_file.replace(".py", ".md")
+    return code_response, mode, file_name, prompt
+
 # Main Function
 def main():
     args = parse_arguments()
@@ -67,14 +99,7 @@ def main():
 
         llm = OllamaLLM(model=MODEL_NAME)
         if args.generate:
-            prompt = """Generate a functional and interesting Python script for a complex algorithmic problem of your choice. Do not add any comments in the script. And do not add any superfluous text outside the Python script.
-            Return only the response in this exact format:
-
-            File name: $$$<script_name_without_extension>$$$
-            Code:
-            <script_content>
-            """
-            mode = "Generating Python script"
+            code_response, mode, prompt = generate_script(llm)
         else:
             generated_files = os.listdir(os.path.join(REPO_PATH, "generated"))
             generated_files = [file for file in generated_files if not file.endswith(".md")]
@@ -88,25 +113,17 @@ def main():
                 script_content = f.read()
 
             if args.doc:
-                prompt = f"""Generate Markdown documentation for the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
-                {script_content}
-                """
-                mode = "Generating documentation"
-                file_name = random_file.replace(".py", ".md")
+                code_response, mode, file_name, prompt = generate_doc(llm, script_content, random_file)
             elif args.fix:
-                prompt = f"""Fix the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
-                {script_content}
-                """
-                mode = "Fixing Python script"
-                file_name = random_file
-
-        code_response = get_script_content(prompt, llm, mode)
+                code_response, mode, file_name, prompt = fix_script(llm, script_content, random_file)
 
         while True:
             try:
                 if args.generate or args.fix:
+                    extension = ".py"
                     script_content_match = re.search(r'```python(.*?)```', code_response, re.DOTALL)
                 else:
+                    extension = ".md"
                     script_content_match = re.search(r'```markdown(.*)```', code_response, re.DOTALL)
 
                 if script_content_match:
@@ -138,7 +155,7 @@ def main():
                 print(f"[❌] Error with script name: {e}")
                 show_code(code_response)
                 script_name = input("Enter the script name: ")
-            file_name = f"generated/{script_name}.py"
+            file_name = f"generated/{script_name}.{extension}"
             file_path = os.path.join(REPO_PATH, file_name)
 
         with open(file_path, "w") as f:
