@@ -34,7 +34,7 @@ This project automates the generation and push of Python scripts to a GitHub rep
     python3 generate_code.py -f  # To repair an existing script
     python3 generate_code.py -d  # To generate documentation for a script
     python3 generate_code.py -c  # To clean the repository
-    python3 generate_code.py -u  # To update the code generation model
+    python3 generate_code.py -u  # To push the update of main script and documentation (optional add description of the update)
     python3 generate_code.py -a  # To generate, fix, and document a script
     ```
 2. The script will:
