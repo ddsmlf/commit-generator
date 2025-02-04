@@ -20,7 +20,14 @@ def parse_arguments():
     group.add_argument('-d', '--doc', action='store_true', help='Generate documentation for a script')
     group.add_argument('-c', '--clean', action='store_true', help='Push for repo cleanup')
     group.add_argument('-u', '--update', action='store_true', help='Update the code generation model')
+    group.add_argument('-a', '--all', action='store_true', help='Generate, fix and document a Python script')
     return parser.parse_args()
+
+# Pipeline for all
+def pipeline(llm):
+    main(True, False, False, False, False)
+    main(False, True, False, False, False)
+    main(False, False, True, False, False)
 
 # Git Operations
 def git_operations(commit_message):
@@ -74,21 +81,10 @@ def generate_doc(llm, script_content, random_file):
     return code_response, mode, file_name, prompt
 
 # Main Function
-def main():
-    args = parse_arguments()
-
-    if sum([args.generate, args.fix, args.doc, args.clean, args.update]) != 1:
-        print("""❌ Please choose only one option among:
-              -g, --generate : Generate a Python script
-              -f, --fix : Fix an existing Python script
-              -d, --doc : Generate documentation for a script
-              -c, --clean : Push for repo cleanup
-              -u, --update : Update the code generation model""")
-        sys.exit(1)
-
-    if args.clean:
+def main(generate, fix, doc, clean, update):
+    if clean:
         git_operations("[CLEAN] Cleanup of generated files")
-    elif args.update:
+    elif update:
         subprocess.run(['git', '-C', REPO_PATH, 'pull'])
         git_operations("[UPDATE] Update code generation")
     else:
@@ -98,7 +94,7 @@ def main():
         print("[✔] Model 'deepseek' ready!")
 
         llm = OllamaLLM(model=MODEL_NAME)
-        if args.generate:
+        if generate:
             code_response, mode, prompt = generate_script(llm)
         else:
             generated_files = os.listdir(os.path.join(REPO_PATH, "generated"))
@@ -112,14 +108,14 @@ def main():
             with open(file_path, "r") as f:
                 script_content = f.read()
 
-            if args.doc:
+            if doc:
                 code_response, mode, file_name, prompt = generate_doc(llm, script_content, random_file)
-            elif args.fix:
+            elif fix:
                 code_response, mode, file_name, prompt = fix_script(llm, script_content, random_file)
 
         while True:
             try:
-                if args.generate or args.fix:
+                if generate or fix:
                     extension = ".py"
                     script_content_match = re.search(r'```python(.*?)```', code_response, re.DOTALL)
                 else:
@@ -147,7 +143,7 @@ def main():
                 else:
                     exit()
 
-        if args.generate:
+        if generate:
             try:
                 file_name_line = re.search(r'\$\$\$(.*?)\$\$\$', code_response).group(1)
                 script_name = file_name_line.replace(" ", "_").replace("-", "_")
@@ -165,4 +161,27 @@ def main():
         git_operations(f"{mode} {file_name}")
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    sum = sum([args.generate, args.fix, args.doc, args.clean, args.update, args.all]) 
+    if sum == 0:
+        generate = True
+    elif sum != 1:
+        print("""❌ Please choose only one option among:
+              -g, --generate : Generate a Python script
+              -f, --fix : Fix an existing Python script
+              -d, --doc : Generate documentation for a script
+              -c, --clean : Push for repo cleanup
+              -u, --update : Update the code generation model
+              -a, --all : Generate, fix and document a Python script (3 pushes)
+              """)
+        sys.exit(1)
+    else:
+        if args.all:
+            pipeline()
+            sys.exit(0)
+        generate = args.generate
+    fix = args.fix
+    doc = args.doc
+    clean = args.clean
+    update = args.update
+    main(generate, fix, doc, clean, update)

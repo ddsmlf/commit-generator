@@ -36,6 +36,7 @@ This project automates the generation and push of Python scripts to a GitHub rep
     python3 generate_code.py -d  # To generate documentation for a script
     python3 generate_code.py -c  # To clean the repository
     python3 generate_code.py -u  # To update the code generation model
+    python3 generate_code.py -a  # To generate, fix, and document a script
     ```
 2. The script will:
     - Check and download the `deepseek-r1` model if necessary.
@@ -62,6 +63,7 @@ To simplify running the script, you can create an alias in your terminal:
 - If the Git push fails, check your Git configurations and ensure you have the necessary permissions to push to the repository.
 
 ## Versions
+- Version 1.4: Added the `--all` option to generate, fix, and document a script
 - Version 1.3: Clean code
 - Version 1.2: Added arguments to edit and document the generated code
 - Version 1.1: Switched to local `deepseek-r1`.
