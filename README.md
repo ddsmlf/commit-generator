@@ -4,7 +4,6 @@
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
 4. [Usage](#usage)
-5. [Automation with alias](#automation-with-alias)
 8. [Versions](#versions)
 9. [Authors](#authors)
 
@@ -28,23 +27,7 @@ This project automates the generation and push of Python scripts to a GitHub rep
     ```
 
 ## Usage
-1. Run the script with the appropriate parameters to generate, repair, document, clean, or update a Python file:
-    ```bash
-    python3 generate_code.py -g  # To generate a script
-    python3 generate_code.py -f  # To repair an existing script
-    python3 generate_code.py -d  # To generate documentation for a script
-    python3 generate_code.py -c  # To clean the repository
-    python3 generate_code.py -u  # To push the update of main script and documentation (optional add description of the update)
-    python3 generate_code.py -a  # To generate, fix, and document a script
-    ```
-2. The script will:
-    - Check and download the `deepseek-r1` model if necessary.
-    - Generate, repair, or document a Python script based on a predefined prompt.
-    - Create a file with a unique name including a timestamp (for generation).
-    - Add, commit, and push the file to the GitHub repository.
-
-## Automation with Alias
-To simplify running the script, you can create an alias in your terminal:
+The script is built to be used as an alias. To create an alias, follow these steps:
 1. Open your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
 2. Add the following line:
     ```bash
@@ -57,7 +40,19 @@ To simplify running the script, you can create an alias in your terminal:
     ```
 4. Now you can run the script with the command `mkstat`.
 
+To run the script, use the following command:
+```bash
+mkstat
+```
+You can also use the following options:
+- `-s` or `--script`: Path to the script to generate.
+- `-a` or `--all`: Generate, fix, and document the script.
+- `-g` or `--generate`: Generate the script. (Default)
+- `-f` or `--fix`: Fix the script.
+- `-d` or `--document`: Document the script.
+
 ## Version History
+- Version 1.6: Public version
 - Version 1.5: Added documentation auto-generation feature.
 - Version 1.4: Added the `--all` option to generate, fix, and document a script
 - Version 1.3: Clean code
