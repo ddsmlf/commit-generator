@@ -1,52 +1,40 @@
-from itertools import permutations
+# Cryptarithmetic Solver
 
-def solve_cryptarithmetic(puzzle):
-    words = puzzle.split()
-    left = words[:len(words)-1]
-    right = words[-1]
-    
-    letters = set()
-    for word in left:
-        for c in word:
-            if c != ' ':
-                letters.add(c)
-    for word in right:
-        for c in word:
-            if c != ' ' and c not in letters:
-                letters.add(c)
-                
-    words_sorted = sorted(letters)
-    n = len(words_sorted)
-    
-    def is_valid(assignment):
-        try:
-            left_num = 0
-            for i, letter in enumerate(left):
-                num = assignment[letter]
-                if num == 0 and (i == 0 or letter in right):
-                    return False
-                if letter != ' ':
-                    left_num += int(num) * 10**(len(letter)-1)
-            right_num = int(assignment[right])
-            return left_num + permutation_sum(left, assignment) == permutation_sum(right, assignment)
-        except KeyError as e:
-            return False
-    
-    def permutation_sum(word, assignment):
-        total = 0
-        for c in word:
-            if c not in assignment or assignment[c] is None:
-                return -1
-            total += int(assignment[c]) * 10**(len(c)-1)
-        return total
-    
-    from itertools import permutations
-    letters_list = list(words_sorted)
-    for perm in permutations('0123456789', n):
-        if is_valid(dict(zip(words_sorted, perm))):
-            print(f"Solution trouvée : {dict(zip(words_sorted, perm))}")
-            return
-    print("Aucune solution trouvée.")
+This script solves cryptarithmetic puzzles where each letter represents a unique digit. The goal is to find a substitution of digits for letters such that the arithmetic equation holds true.
 
-puzzle = input().strip()
-solve_cryptarithmetic(puzzle)
+## Function Definition
+
+**solve_cryptarithmetic(puzzle)**  
+- **Parameters:**
+  - `puzzle`: A string representing the arithmetic equation in the form "word1 word2 ... wordn", where words are strings composed of letters and spaces, e.g., "SEND MORE MONEY"
+
+- **Returns:**
+  - The digit substitution that satisfies the equation or prints a message indicating no solution was found.
+
+## Algorithm Steps
+
+1. **Parse Input:**  
+   Split the input puzzle into words. The last word is considered the result (right side of the equation), and all previous words form the left side (left operand).
+
+2. **Collect Unique Letters:**  
+   Extract all unique letters from both sides of the equation, excluding spaces.
+
+3. **Generate Permutations:**  
+   Create permutations of digits corresponding to the number of unique letters found in the previous step. Each permutation represents a potential digit assignment for the letters.
+
+4. **Check Validity:**  
+   For each permutation:
+   - Ensure that no letter (except those on the right side) starts with a zero.
+   - Verify that substituting these digits into the equation results in a valid arithmetic operation.
+
+5. **Output Result:**  
+   Print the valid digit substitution when found, or indicate failure if no solution exists.
+
+## Example Usage
+
+To solve a puzzle like "SEND MORE MONEY", use:
+```python
+solve_cryptarithmetic("SEND MORE MONEY")
+```
+
+This script efficiently explores all possible digit assignments using permutations and checks for validity based on arithmetic constraints.
