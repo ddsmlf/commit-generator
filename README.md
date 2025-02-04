@@ -62,6 +62,7 @@ To simplify running the script, you can create an alias in your terminal:
 - If the Git push fails, check your Git configurations and ensure you have the necessary permissions to push to the repository.
 
 ## Versions
+- Version 1.3: Clean code
 - Version 1.2: Added arguments to edit and document the generated code
 - Version 1.1: Switched to local `deepseek-r1`.
 - Version 1.0: Project initialization with the `deepseek-coder` model.
