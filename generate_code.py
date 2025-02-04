@@ -19,7 +19,7 @@ def parse_arguments():
     group.add_argument('-f', '--fix', action='store_true', help='Fix an existing Python script')
     group.add_argument('-d', '--doc', action='store_true', help='Generate documentation for a script')
     group.add_argument('-c', '--clean', action='store_true', help='Push for repo cleanup')
-    group.add_argument('-u', '--update', action='store_true', help='Update the code generation model')
+    group.add_argument('-u', '--update', nargs='?', const=True, help='Update the code generation model with an optional description')
     group.add_argument('-a', '--all', action='store_true', help='Generate, fix and document a Python script')
     return parser.parse_args()
 
@@ -57,7 +57,7 @@ def generate_script(llm):
     Code:
     <script_content>
     """
-    mode = "Generating Python script"
+    mode = "[ADD]"
     code_response = get_script_content(prompt, llm, mode)
     return code_response, mode, prompt
 
@@ -66,7 +66,7 @@ def fix_script(llm, script_content, random_file):
     prompt = f"""Fix the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
     {script_content}
     """
-    mode = "Fixing Python script"
+    mode = "[FIX]"
     code_response = get_script_content(prompt, llm, mode)
     return code_response, mode, random_file, prompt
 
@@ -75,25 +75,29 @@ def generate_doc(llm, script_content, random_file):
     prompt = f"""Generate Markdown documentation for the following Python script, return the complete code without adding any comments and superfluous text outside the Python script:
     {script_content}
     """
-    mode = "Generating documentation"
+    mode = "[DOC]"
     code_response = get_script_content(prompt, llm, mode)
     file_name = random_file.replace(".py", ".md")
     return code_response, mode, file_name, prompt
 
 # Main Function
-def main(generate, fix, doc, clean, update):
+def main(generate, fix, doc, clean, update=None):
     if clean:
         git_operations("[CLEAN] Cleanup of generated files")
     elif update:
         subprocess.run(['git', '-C', REPO_PATH, 'pull'])
-        git_operations("[UPDATE] Update code generation")
+        if update == True:
+            new_fetaure = input("Description of the new feature: ")
+        else:
+            new_fetaure = update
+        git_operations(f"[FEAT] {new_fetaure}")
     else:
         subprocess.run(["ollama", "pull", MODEL_NAME])
         time.sleep(2)
         subprocess.Popen(["ollama", "serve", MODEL_NAME])
         print("[✔] Model 'deepseek' ready!")
 
-        llm = OllamaLLM(model=MODEL_NAME)
+        llm = OllamaLLM()
         if generate:
             code_response, mode, prompt = generate_script(llm)
         else:
@@ -158,11 +162,11 @@ def main(generate, fix, doc, clean, update):
             f.write(script_content)
 
         print(f"[✔] File created: {file_path}")
-        git_operations(f"{mode} {file_name}")
+        git_operations(f"{mode} {file_name.replace('generated/', '')}")
 
 if __name__ == "__main__":
     args = parse_arguments()
-    sum = sum([args.generate, args.fix, args.doc, args.clean, args.update, args.all]) 
+    sum = sum([args.generate, args.fix, args.doc, args.clean, bool(args.update), args.all]) 
     if sum == 0:
         generate = True
     elif sum != 1:
@@ -171,7 +175,7 @@ if __name__ == "__main__":
               -f, --fix : Fix an existing Python script
               -d, --doc : Generate documentation for a script
               -c, --clean : Push for repo cleanup
-              -u, --update : Update the code generation model
+              -u, --update : Update the code generation model with an optional description
               -a, --all : Generate, fix and document a Python script (3 pushes)
               """)
         sys.exit(1)
