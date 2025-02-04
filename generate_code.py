@@ -24,7 +24,7 @@ def parse_arguments():
     return parser.parse_args()
 
 # Pipeline for all
-def pipeline(llm):
+def pipeline():
     main(True, False, False, False, False)
     main(False, True, False, False, False)
     main(False, False, True, False, False)
