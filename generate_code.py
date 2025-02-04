@@ -7,8 +7,6 @@ from langchain_ollama import OllamaLLM
 import argparse
 import random
 import sys
-
-
 # Dossier du repo
 repo_path = "/home/melissa/Documents/automat-gh/AUTO"
 
@@ -18,14 +16,19 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-g', '--generate', action='store_true', help='Générer un script Python')
 group.add_argument('-f', '--fix', action='store_true', help='Réparer un script Python existant')
 group.add_argument('-d', '--doc', action='store_true', help='Générer de la documentation pour un script')
-group.add_argument('-c', '--clean', action='store_true', help='Nettoyer les fichiers générés')
-# The -h/--help argument is already included by default in argparse
+group.add_argument('-c', '--clean', action='store_true', help='Push pour le nettoyage du repo')
+group.add_argument('-u', '--update', action='store_true', help='Mettre à jour le modèle code de génération')
 
 args = parser.parse_args()
 
 # Vérifier que exactement une option est sélectionnée
-if sum([args.generate, args.fix, args.doc, args.clean]) != 1:
-    print("❌ Veuillez choisir une seule option parmi -g, -f, -d et -c.")
+if sum([args.generate, args.fix, args.doc, args.clean, args.update]) != 1:
+    print("""❌ Veuillez choisir une seule option parmi :
+          -g, --generate : Générer un script Python
+          -f, --fix : Réparer un script Python existant
+          -d, --doc : Générer de la documentation pour un script
+          -c, --clean : Push pour le nettoyage du repo
+          -u, --update : Mettre à jour le modèle code de génération""")
     sys.exit(1)
 
 # Debug : Afficher l'option choisie
@@ -37,8 +40,6 @@ elif args.doc:
     print("[✔] Mode documentation activé.")
 elif args.clean:
     print("[✔] Mode nettoyage activé.")
-elif args.help:
-    sys.exit(0)
 
 generate = args.generate
 fix = args.fix
@@ -49,6 +50,13 @@ if args.clean:
     subprocess.run(["git", "-C", repo_path, "add", "."])
     subprocess.run(["git", "-C", repo_path, "commit", "-m", "[CLEAN] Nettoyage des fichiers générés"])
     subprocess.run(["git", "-C", repo_path, "push", "origin", "main"])
+
+    print("[✔] Push terminé avec succès !")
+elif args.update:
+    subprocess.run(['git', '-C', repo_path, 'pull'])
+    subprocess.run(['git', '-C', repo_path, 'add', '.'])
+    subprocess.run(['git', '-C', repo_path, 'commit', '-m', '[UPDATE] Update code generation'])
+    subprocess.run(['git', '-C', repo_path, 'push', 'origin', 'main'])
 
     print("[✔] Push terminé avec succès !")
 else :

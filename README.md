@@ -1,56 +1,70 @@
-# AUTO push
-
-## Table des matières
+# AUTO push for GitHub statistics
+## Table of Contents
 1. [Introduction](#introduction)
-2. [Prérequis](#prérequis)
+2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
-4. [Utilisation](#utilisation)
-5. [Automatisation avec alias](#automatisation-avec-alias)
-6. [Dépannage](#dépannage)
+4. [Usage](#usage)
+5. [Automation with alias](#automation-with-alias)
+6. [Troubleshooting](#troubleshooting)
+7. [Versions](#versions)
+8. [Authors](#authors)
 
 ## Introduction
-Ce projet automatise la génération et le push de scripts Python sur un dépôt GitHub en utilisant le modèle `deepseek-coder` d'Ollama. Le script génère un fichier Python basé sur un prompt prédéfini, l'ajoute au dépôt, le commit et le push automatiquement.
+This project automates the generation and push of Python scripts to a GitHub repository using Ollama's `deepseek-r1` model. The script generates a Python file based on a predefined prompt, adds it to the repository, commits, and pushes it automatically.
 
-## Prérequis
+## Prerequisites
 - Python 3.10
-- Ollama installé et configuré
-- Git installé et configuré
-- Accès à un dépôt GitHub
+- Ollama installed and configured
+- Git installed and configured
+- Access to a GitHub repository
 
 ## Installation
-1. Clonez le dépôt sur votre machine locale :
+1. Clone the repository to your local machine:
     ```bash
-    git clone <URL_DU_DEPOT>
+    git clone <REPOSITORY_URL>
     ```
-2. Accédez au dossier du projet :
+2. Navigate to the project folder:
     ```bash
     cd /home/melissa/Documents/automat-gh/AUTO
     ```
 
-## Utilisation
-1. Exécutez le script pour générer et pousser un nouveau fichier Python :
+## Usage
+1. Run the script with the appropriate parameters to generate, repair, document, clean, or update a Python file:
     ```bash
-    python3 generate_code.py
+    python3 generate_code.py -g  # To generate a script
+    python3 generate_code.py -f  # To repair an existing script
+    python3 generate_code.py -d  # To generate documentation for a script
+    python3 generate_code.py -c  # To clean the repository
+    python3 generate_code.py -u  # To update the code generation model
     ```
-2. Le script va :
-    - Vérifier et télécharger le modèle `deepseek-coder` si nécessaire.
-    - Générer un script Python basé sur un prompt prédéfini.
-    - Créer un fichier avec un nom unique incluant un timestamp.
-    - Ajouter, commit et push le fichier sur le dépôt GitHub.
+2. The script will:
+    - Check and download the `deepseek-r1` model if necessary.
+    - Generate, repair, or document a Python script based on a predefined prompt.
+    - Create a file with a unique name including a timestamp (for generation).
+    - Add, commit, and push the file to the GitHub repository.
 
-## Automatisation avec alias
-Pour simplifier l'exécution du script, vous pouvez créer un alias dans votre terminal :
-1. Ouvrez votre fichier de configuration de shell (par exemple, `~/.bashrc` ou `~/.zshrc`).
-2. Ajoutez la ligne suivante :
+## Automation with alias
+To simplify running the script, you can create an alias in your terminal:
+1. Open your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
+2. Add the following line:
     ```bash
-    alias mkstat="python3 /home/melissa/Documents/automat-gh/AUTO/generate_code.py"
+    alias mkstat="alias mkstat='python3 /home/melissa/Documents/automat-gh/AUTO/generate_code.py "$@"'
+"
     ```
-3. Rechargez votre fichier de configuration de shell :
+3. Reload your shell configuration file:
     ```bash
     source ~/.bashrc
     ```
-4. Maintenant, vous pouvez exécuter le script avec la commande `mkstat`.
+4. Now you can run the script with the command `mkstat`.
 
-## Dépannage
-- Si le modèle `deepseek-coder` n'est pas téléchargé correctement, assurez-vous que Ollama est installé et configuré correctement.
-- Si le push Git échoue, vérifiez vos configurations Git et assurez-vous que vous avez les permissions nécessaires pour pousser sur le dépôt.
+## Troubleshooting
+- If the `deepseek-r1` model is not downloaded correctly, ensure that Ollama is installed and configured properly.
+- If the Git push fails, check your Git configurations and ensure you have the necessary permissions to push to the repository.
+
+## Versions
+- Version 1.2: Added arguments to edit and document the generated code
+- Version 1.1: Switched to local `deepseek-r1`.
+- Version 1.0: Project initialization with the `deepseek-coder` model.
+
+## Authors
+- Melissa Colin [GitHub](https://github.com/ddsmlf)
