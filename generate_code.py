@@ -104,7 +104,8 @@ def update_doc_main(new_fetaure):
     ```markdown
     {doc}
     ```
-    New feature to add in the documentation: {new_fetaure}
+    New feature to add in the documentation: "{new_fetaure}"
+    Update jsute the section version of the documentation utilisation if parameter has been changed.
 
     Return only the complete Markdown documentation updated. Don't add any comments or superfluous text outside the Markdown documentation.
     """

@@ -5,8 +5,6 @@
 3. [Installation](#installation)
 4. [Usage](#usage)
 5. [Automation with alias](#automation-with-alias)
-6. [Auto Generation of Documentation](#auto-generation-of-documentation)
-7. [Troubleshooting](#troubleshooting)
 8. [Versions](#versions)
 9. [Authors](#authors)
 
@@ -59,36 +57,14 @@ To simplify running the script, you can create an alias in your terminal:
     ```
 4. Now you can run the script with the command `mkstat`.
 
-## Auto Generation of Documentation
-The script includes an auto-generation feature for documentation when specific flags are used. Here's how it works:
-
-1. **Enabling Documentation Generation**: Use the `-d` flag while running the script to enable auto-documentation.
-   
-   ```bash
-   python3 generate_code.py -d
-   ```
-
-2. **Documentation Flags**:
-   - `-d`: Enable documentation generation for the generated file.
-
-3. **Output Directories**:
-   - The generated Python files will be placed in a subdirectory named `generated/`.
-   - Documentation files (e.g., `.md`, `.rst`, `.mdwn`) will be created in the same directory as the script output.
-
-4. **Customization**: Users can customize the documentation format by modifying the template files located in the `templates` directory within the project.
-
-5. **Clean-Up**: The `-c` flag can be used to clean up unnecessary directories after generation:
-   
-   ```bash
-   python3 generate_code.py -c
-   ```
-
-## Troubleshooting
-[Troubleshooting](#troubleshooting)
-
 ## Version History
-1. 1.0.0 - Initial release with core functionality.
-2. 1.1.0 - Added documentation auto-generation feature.
+- Version 1.5: Added documentation auto-generation feature.
+- Version 1.4: Added the `--all` option to generate, fix, and document a script
+- Version 1.3: Clean code
+- Version 1.2: Added arguments to edit and document the generated code
+- Version 1.1: Switched to local `deepseek-r1`.
+- Version 1.0: Project initialization with the `deepseek-coder` model.
+
 
 ## Authors
 - [Melissa Carter](https://github.com/melissacarter) - Original author and maintainer
