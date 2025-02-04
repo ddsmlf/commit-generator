@@ -48,7 +48,7 @@ To simplify running the script, you can create an alias in your terminal:
 1. Open your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
 2. Add the following line:
     ```bash
-    alias mkstat="alias mkstat='python3 /home/melissa/Documents/automat-gh/AUTO/generate_code.py "$@"'
+    alias mkstat="alias mkstat='python3 path/to/your/repo/generate_code.py -s 'path/to/your/repo'"$@"'
 "
     ```
 3. Reload your shell configuration file:

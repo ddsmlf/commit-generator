@@ -8,12 +8,12 @@ import random
 import sys
 
 # Constants
-REPO_PATH = "/home/melissa/Documents/automat-gh/AUTO"
 MODEL_NAME = "deepseek-r1"
 
 # Argument Parser
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Generate or modify a Python script with Ollama')
+    parser.add_argument('-r', '--repo', required=True, help='Path to the repository')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-g', '--generate', action='store_true', help='Generate a Python script')
     group.add_argument('-f', '--fix', action='store_true', help='Fix an existing Python script')
@@ -24,16 +24,16 @@ def parse_arguments():
     return parser.parse_args()
 
 # Pipeline for all
-def pipeline():
-    main(True, False, False, False, False)
-    main(False, True, False, False, False)
-    main(False, False, True, False, False)
+def pipeline(repo_path):
+    main(repo_path, True, False, False, False, False)
+    main(repo_path, False, True, False, False, False)
+    main(repo_path, False, False, True, False, False)
 
 # Git Operations
-def git_operations(commit_message):
-    subprocess.run(["git", "-C", REPO_PATH, "add", "."])
-    subprocess.run(["git", "-C", REPO_PATH, "commit", "-m", commit_message])
-    subprocess.run(["git", "-C", REPO_PATH, "push", "origin", "main"])
+def git_operations(repo_path, commit_message):
+    subprocess.run(["git", "-C", repo_path, "add", "."])
+    subprocess.run(["git", "-C", repo_path, "commit", "-m", commit_message])
+    subprocess.run(["git", "-C", repo_path, "push", "origin", "main"])
     print("[✔] Push completed successfully!")
 
 # Show Code
@@ -91,12 +91,12 @@ def run_model():
     return llm
 
 # Update documentation of main function
-def update_doc_main(new_fetaure):
+def update_doc_main(repo_path, new_fetaure):
     #read the actuel doc :
-    with open("README.md", "r") as f:
+    with open(os.path.join(repo_path, "README.md"), "r") as f:
         doc = f.read()
     # read the new version of the code
-    with open("generate_code.py", "r") as f:
+    with open(os.path.join(repo_path, "generate_code.py"), "r") as f:
         code = f.read()
     # run model
     llm = run_model()
@@ -112,7 +112,7 @@ def update_doc_main(new_fetaure):
     code_response = get_script_content(prompt, llm, "Documentation update")
     try :
         new_doc = re.search(r'```markdown(.*)```', code_response, re.DOTALL).group(1).strip()
-        with open("README.md", "w") as f:
+        with open(os.path.join(repo_path, "README.md"), "w") as f:
             f.write(new_doc)
         print("[✔] Documentation updated")
     except Exception as e:
@@ -120,36 +120,35 @@ def update_doc_main(new_fetaure):
         show_code(code_response)
         r = input("Press Enter to exit or R to retry...")
         if r.lower() == "r":
-            update_doc_main(new_fetaure)
+            update_doc_main(repo_path, new_fetaure)
         else:
             exit()
 
-
 # Main Function
-def main(generate, fix, doc, clean, update=None):
+def main(repo_path, generate, fix, doc, clean, update=None):
     if clean:
-        git_operations("[CLEAN] Cleanup of generated files")
+        git_operations(repo_path, "[CLEAN] Cleanup of generated files")
     elif update:
-        subprocess.run(['git', '-C', REPO_PATH, 'pull'])
+        subprocess.run(['git', '-C', repo_path, 'pull'])
         if update == True:
             new_fetaure = input("Description of the new feature: ")
         else:
             new_fetaure = update
-        update_doc_main(new_fetaure)
-        git_operations(f"[FEAT] {new_fetaure}")
+        update_doc_main(repo_path, new_fetaure)
+        git_operations(repo_path, f"[FEAT] {new_fetaure}")
     else:
         llm = run_model()
         if generate:
             code_response, mode, prompt = generate_script(llm)
         else:
-            generated_files = os.listdir(os.path.join(REPO_PATH, "generated"))
+            generated_files = os.listdir(os.path.join(repo_path, "generated"))
             generated_files = [file for file in generated_files if not file.endswith(".md")]
             if not generated_files:
                 print("[❌] No generated files found.")
                 sys.exit(1)
 
             random_file = random.choice(generated_files)
-            file_path = os.path.join(REPO_PATH, "generated", random_file)
+            file_path = os.path.join(repo_path, "generated", random_file)
             with open(file_path, "r") as f:
                 script_content = f.read()
 
@@ -197,13 +196,13 @@ def main(generate, fix, doc, clean, update=None):
                 show_code(code_response)
                 script_name = input("Enter the script name: ")
             file_name = f"generated/{script_name}.{extension}"
-            file_path = os.path.join(REPO_PATH, file_name)
+            file_path = os.path.join(repo_path, file_name)
 
         with open(file_path, "w") as f:
             f.write(script_content)
 
         print(f"[✔] File created: {file_path}")
-        git_operations(f"{mode} {file_name.replace('generated/', '')}")
+        git_operations(repo_path, f"{mode} {file_name.replace('generated/', '')}")
 
 if __name__ == "__main__":
     args = parse_arguments()
@@ -222,11 +221,11 @@ if __name__ == "__main__":
         sys.exit(1)
     else:
         if args.all:
-            pipeline()
+            pipeline(args.repo)
             sys.exit(0)
         generate = args.generate
     fix = args.fix
     doc = args.doc
     clean = args.clean
     update = args.update
-    main(generate, fix, doc, clean, update)
+    main(args.repo, generate, fix, doc, clean, update)
