@@ -80,6 +80,50 @@ def generate_doc(llm, script_content, random_file):
     file_name = random_file.replace(".py", ".md")
     return code_response, mode, file_name, prompt
 
+# Run Model
+def run_model():
+    subprocess.run(["ollama", "pull", MODEL_NAME])
+    time.sleep(2)
+    subprocess.Popen(["ollama", "serve", MODEL_NAME])
+    print("[✔] Model 'deepseek' ready!")
+
+    llm = OllamaLLM(model=MODEL_NAME)
+    return llm
+
+# Update documentation of main function
+def update_doc_main(new_fetaure):
+    #read the actuel doc :
+    with open("README.md", "r") as f:
+        doc = f.read()
+    # read the new version of the code
+    with open("generate_code.py", "r") as f:
+        code = f.read()
+    # run model
+    llm = run_model()
+    prompt = f"""Update this Markdown documentation :
+    ```markdown
+    {doc}
+    ```
+    New feature to add in the documentation: {new_fetaure}
+
+    Return only the complete Markdown documentation updated. Don't add any comments or superfluous text outside the Markdown documentation.
+    """
+    code_response = get_script_content(prompt, llm, "Documentation update")
+    try :
+        new_doc = re.search(r'```markdown(.*)```', code_response, re.DOTALL).group(1).strip()
+        with open("README.md", "w") as f:
+            f.write(new_doc)
+        print("[✔] Documentation updated")
+    except Exception as e:
+        print(f"[❌] Error: {e}\nDocumentation not updated.")
+        show_code(code_response)
+        r = input("Press Enter to exit or R to retry...")
+        if r.lower() == "r":
+            update_doc_main(new_fetaure)
+        else:
+            exit()
+
+
 # Main Function
 def main(generate, fix, doc, clean, update=None):
     if clean:
@@ -90,14 +134,10 @@ def main(generate, fix, doc, clean, update=None):
             new_fetaure = input("Description of the new feature: ")
         else:
             new_fetaure = update
+        update_doc_main(new_fetaure)
         git_operations(f"[FEAT] {new_fetaure}")
     else:
-        subprocess.run(["ollama", "pull", MODEL_NAME])
-        time.sleep(2)
-        subprocess.Popen(["ollama", "serve", MODEL_NAME])
-        print("[✔] Model 'deepseek' ready!")
-
-        llm = OllamaLLM()
+        llm = run_model()
         if generate:
             code_response, mode, prompt = generate_script(llm)
         else:
