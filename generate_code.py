@@ -106,7 +106,12 @@ else :
 
     llm = OllamaLLM(model="deepseek-r1")
     def get_script_content(prompt):
-        print("[⏳] Génération du script Python...")
+        if generate:
+            print("[⏳] Génération du script Python...")
+        elif fix:
+            print("[⏳] Correction du script Python...")
+        elif doc:
+            print("[⏳] Génération de la documentation...")
 
         response = llm.invoke(prompt)
 
@@ -122,7 +127,7 @@ else :
                 script_content_match = re.search(r'```python(.*?)```', code_response, re.DOTALL)
             else:
                 # Utilisation d'une expression régulière pour extraire le contenu entre ```md et ```
-                script_content_match = re.search(r'```md(.*?)```', code_response, re.DOTALL)
+                script_content_match = re.search(r'```markdown(.*)```', code_response, re.DOTALL)
                 
             if script_content_match:
                 script_content = script_content_match.group(1).strip()
